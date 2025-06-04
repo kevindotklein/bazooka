@@ -1,6 +1,7 @@
 -module(bazooka).
 
--export([match_char/1, match_string/1, fmap/2, bind/2, many/1, choice/1, then/2, pure/1, applicative/2]).
+-export([match_char/1, match_string/1, fmap/2, bind/2, many/1, choice/1, then/2, pure/1, applicative/2, span/1]).
+-export_type([parser/1]).
 
 -type parser(ValueType) ::
   fun((string()) -> {ok, ValueType, string()} | {error, string()}).
@@ -33,7 +34,7 @@ match_string([H | T]) ->
   end.
 
 %% <$>
--spec fmap(parser(any()), fun((any()) -> any())) -> parser(any()).
+-spec fmap(parser(A), fun((A) -> any())) -> parser(any()).
 fmap(Parser, Fun) ->
   fun(Input) ->
      case Parser(Input) of
@@ -43,7 +44,7 @@ fmap(Parser, Fun) ->
   end.
 
 %% >>=
--spec bind(parser(any()), fun((any()) -> parser(any()))) -> parser(any()).
+-spec bind(parser(A), fun((A) -> parser(A))) -> parser(A).
 bind(P1, Fun) ->
   fun(Input) ->
      case P1(Input) of
@@ -65,7 +66,7 @@ then(P1, P2) ->
   end.
 
 %% many parser
--spec many(parser(any())) -> parser(any()).
+-spec many(parser(A)) -> parser([A]).
 many(P) ->
   fun(Input) -> many_loop(P, Input, []) end.
 
@@ -90,14 +91,14 @@ choice([P | Ps]) ->
   end.
 
 %% pure
--spec pure(any()) -> parser(any()).
+-spec pure(A) -> parser(A).
 pure(X) ->
   fun(Input) ->
     {ok, X, Input}
   end.
 
 %% <*>
--spec applicative(parser(any()), parser(any())) -> parser(any()).
+-spec applicative(parser(fun((A) -> any())), parser(A)) -> parser(any()).
 applicative(P1, P2) ->
   fun(Input) ->
     case P1(Input) of
@@ -108,4 +109,15 @@ applicative(P1, P2) ->
         end;
       {error, _} = E -> E
     end
+  end.
+
+%% span
+-spec span(fun((char()) -> boolean())) -> parser(string()).
+span(Criteria) ->
+  fun(Input) -> span_loop(Criteria, Input, []) end.
+
+span_loop(Criteria, [H|T], Acc) ->
+  case Criteria(H) of
+    true -> span_loop(Criteria, T, [H | Acc]);
+    false -> {ok, lists:reverse(Acc), [H|T]}
   end.
