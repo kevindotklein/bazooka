@@ -1,6 +1,6 @@
 -module(bazooka).
 
--export([match_char/1, match_string/1, fmap/2, bind/2, many/1, choice/1, then/2, pure/1, applicative/2, span/1]).
+-export([match_char/1, match_string/1, fmap/2, bind/2, many/1, choice/1, then/2, pure/1, applicative/2, span/1, is_digit/1, is_dot/1, bool_choice/1]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -120,4 +120,23 @@ span_loop(Criteria, [H|T], Acc) ->
   case Criteria(H) of
     true -> span_loop(Criteria, T, [H | Acc]);
     false -> {ok, lists:reverse(Acc), [H|T]}
+  end.
+
+-spec is_digit(char()) -> boolean().
+is_digit(Char) when Char >= $0, Char =< $9 -> true;
+is_digit(_) -> false.
+
+-spec is_dot(char()) -> boolean().
+is_dot(Char) when Char == $. -> true;
+is_dot(_) -> false.
+
+%% u can use lists:any/2 :p
+-spec bool_choice([fun((A :: char()) -> boolean())]) -> fun((A :: char()) -> boolean()).
+bool_choice([BoolFun]) -> fun(Char) -> BoolFun(Char) end;
+bool_choice([BoolFun|BoolFuns]) ->
+  fun(Char) ->
+    case BoolFun(Char) of
+      true -> true;
+      false -> (bool_choice(BoolFuns))(Char)
+    end
   end.
