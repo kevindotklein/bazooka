@@ -23,10 +23,28 @@ p_json_bool() ->
     end).
 
 p_json_number() ->
-  io:format("todo~n").
+  fun(Input) ->
+    case (bazooka:span(fun bazooka:is_digit/1))(Input) of
+      {ok, IntPart, Rest1} when IntPart =/= [] ->
+        case (bazooka:match_char($.))(Rest1) of
+          {ok, _, Rest2} ->
+            case (bazooka:span(fun bazooka:is_digit/1))(Rest2) of
+              {ok, FracPart, Rest3} when FracPart =/= [] ->
+                NumberStr = lists:flatten([IntPart, ".", FracPart]),
+                {ok, {json_number, list_to_float(NumberStr)}, Rest3};
+              _ ->
+                {error, Rest1}
+            end;
+          {error, _} ->
+            {ok, {json_number, list_to_integer(IntPart)}, Rest1}
+        end;
+      _ -> {error, Input}
+    end
+  end.
 
 p_json() ->
   bazooka:choice([
     p_json_null(),
-    p_json_bool()
+    p_json_bool(),
+    p_json_number()
   ]).

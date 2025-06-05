@@ -1,6 +1,18 @@
 -module(bazooka).
 
--export([match_char/1, match_string/1, fmap/2, bind/2, many/1, choice/1, then/2, pure/1, applicative/2, span/1, is_digit/1, is_dot/1, bool_choice/1]).
+-export([match_char/1,
+        match_string/1,
+        fmap/2,
+        bind/2,
+        many/1,
+        choice/1,
+        then/2,
+        pure/1,
+        applicative/2,
+        span/1,
+        is_digit/1,
+        is_dot/1,
+        bool_choice/1]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -116,6 +128,7 @@ applicative(P1, P2) ->
 span(Criteria) ->
   fun(Input) -> span_loop(Criteria, Input, []) end.
 
+span_loop(_, [], Acc) -> {ok, lists:reverse(Acc), ""};
 span_loop(Criteria, [H|T], Acc) ->
   case Criteria(H) of
     true -> span_loop(Criteria, T, [H | Acc]);
