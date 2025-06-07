@@ -12,7 +12,10 @@
         span/1,
         is_digit/1,
         is_dot/1,
-        bool_choice/1]).
+        bool_choice/1,
+        then_right/2,
+        then_left/2,
+        string_literal/0]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -153,3 +156,37 @@ bool_choice([BoolFun|BoolFuns]) ->
       false -> (bool_choice(BoolFuns))(Char)
     end
   end.
+
+%% *>
+-spec then_right(parser(A), parser(B)) -> parser(A | B).
+then_right(P1, P2) ->
+  fun(Input) ->
+    case P1(Input) of
+      {ok, _, Rest} -> P2(Rest);
+      {error, _} = E -> E
+    end
+  end.
+
+%% <*
+-spec then_left(parser(A), parser(B)) -> parser(A | B).
+then_left(P1, P2) ->
+  fun(Input) ->
+    case P1(Input) of
+      {ok, Val, Rest1} -> 
+        case P2(Rest1) of
+          {ok, _, Rest2} -> {ok, Val, Rest2};
+          {error, _} = E -> E
+        end;
+      {error, _} = E -> E
+    end
+  end.
+
+%% TODO: escape chars
+-spec string_literal() -> parser(string()).
+string_literal() ->
+  span(fun(Char) ->
+           case Char of
+               $" -> false;
+               _  -> true
+           end
+       end).

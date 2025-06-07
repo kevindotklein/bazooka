@@ -1,6 +1,6 @@
 -module(json_parser).
 
--export([p_json_null/0, p_json_bool/0, p_json/0, p_json_number/0]).
+-export([p_json_null/0, p_json_bool/0, p_json/0, p_json_number/0, p_json_string/0]).
 
 -type json_value()
   :: json_null
@@ -41,6 +41,15 @@ p_json_number() ->
       _ -> {error, Input}
     end
   end.
+
+-spec p_json_string() -> bazooka:parser(json_value()).
+p_json_string() ->
+  StrParser = bazooka:then_right(
+                bazooka:match_char($"),
+                bazooka:then_left(bazooka:string_literal(), bazooka:match_char($"))),
+  bazooka:fmap(
+    StrParser,
+    fun(String) -> {json_string, String} end).
 
 p_json() ->
   bazooka:choice([
