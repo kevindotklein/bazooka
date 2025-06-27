@@ -15,7 +15,9 @@
         bool_choice/1,
         then_right/2,
         then_left/2,
-        string_literal/0]).
+        string_literal/0,
+        spaces/0,
+        sep_by/2]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -190,3 +192,21 @@ string_literal() ->
                _  -> true
            end
        end).
+
+-spec spaces() -> parser(string()).
+spaces() ->
+  span(fun(Char) ->
+           case Char of
+            32 -> true;
+            _ -> false
+           end
+    end).
+
+%% P1 = sep, P2 = element
+-spec sep_by(parser(A :: any()), parser(B)) -> parser([B]).
+sep_by(P1, P2) ->
+  choice([
+    applicative(fmap(P2, fun(First) ->
+        fun(Rest) -> [First | Rest] end
+      end), many(then_right(P1, P2))),
+    pure([])]).

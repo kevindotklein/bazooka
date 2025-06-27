@@ -51,9 +51,13 @@ p_json_string() ->
     StrParser,
     fun(String) -> {json_string, String} end).
 
+% p_json_array() ->
+  
+
 p_json() ->
   bazooka:choice([
     p_json_null(),
     p_json_bool(),
-    p_json_number()
+    p_json_number(),
+    p_json_string()
   ]).
