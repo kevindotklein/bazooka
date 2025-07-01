@@ -17,7 +17,8 @@
         then_left/2,
         string_literal/0,
         spaces/0,
-        sep_by/2]).
+        sep_by/2,
+        lazy/1]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -201,6 +202,10 @@ spaces() ->
             _ -> false
            end
     end).
+
+-spec lazy(fun((A :: string() | char()) -> (parser(any())))) -> parser(any()).
+lazy(Fun) ->
+  fun(Input) -> (Fun())(Input) end.
 
 %% P1 = sep, P2 = element
 -spec sep_by(parser(A :: any()), parser(B)) -> parser([B]).
