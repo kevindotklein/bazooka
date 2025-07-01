@@ -18,7 +18,8 @@
         string_literal/0,
         spaces/0,
         sep_by/2,
-        lazy/1]).
+        lazy/1,
+        between/3]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -203,7 +204,7 @@ spaces() ->
            end
     end).
 
--spec lazy(fun((A :: string() | char()) -> (parser(any())))) -> parser(any()).
+-spec lazy(parser(A)) -> parser(A).
 lazy(Fun) ->
   fun(Input) -> (Fun())(Input) end.
 
@@ -215,3 +216,7 @@ sep_by(P1, P2) ->
         fun(Rest) -> [First | Rest] end
       end), many(then_right(P1, P2))),
     pure([])]).
+
+-spec between(parser(any()), parser(any()), parser(A)) -> parser(A).
+between(Left, Right, Item) ->
+  then_right(Left, then_left(Item, Right)).
