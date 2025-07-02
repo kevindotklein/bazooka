@@ -1,6 +1,12 @@
 -module(json_parser).
 
--export([p_json_null/0, p_json_bool/0, p_json/0, p_json_number/0, p_json_string/0, p_json_array/0]).
+-export([p_json_null/0,
+        p_json_bool/0,
+        p_json/0,
+        p_json_number/0,
+        p_json_string/0,
+        p_json_array/0,
+        p_json_object/0]).
 
 -type json_value()
   :: json_null
@@ -64,11 +70,30 @@ p_json_array() ->
     Array,
     fun(A) -> {json_array, A} end).
 
+-spec p_json_object() -> bazooka:parser(json_value()).
+p_json_object() ->
+  Pair = bazooka:applicative(bazooka:applicative(bazooka:fmap(
+    bazooka:between(bazooka:match_char($"), bazooka:match_char($"), bazooka:string_literal()),
+    fun(Key) ->
+      fun(_) ->
+        fun(Value) -> {Key, Value} end
+      end
+    end), bazooka:between(bazooka:spaces(), bazooka:spaces(), bazooka:match_char($:))), bazooka:lazy(fun p_json/0)),
+
+  Items = bazooka:sep_by(
+    bazooka:between(bazooka:spaces(), bazooka:spaces(), bazooka:match_char($,)), Pair),
+
+  Obj = bazooka:between(bazooka:match_char(${), bazooka:match_char($}),
+    bazooka:between(bazooka:spaces(), bazooka:spaces(), Items)),
+
+  bazooka:fmap(Obj, fun(O) -> {json_object, O} end).
+
 p_json() ->
   bazooka:choice([
     p_json_null(),
     p_json_bool(),
     p_json_number(),
     p_json_string(),
-    p_json_array()
+    p_json_array(),
+    p_json_object()
   ]).
