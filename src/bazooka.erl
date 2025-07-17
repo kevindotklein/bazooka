@@ -19,7 +19,8 @@
         spaces/0,
         sep_by/2,
         lazy/1,
-        between/3]).
+        between/3,
+        one_of/1]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -220,3 +221,13 @@ sep_by(P1, P2) ->
 -spec between(parser(any()), parser(any()), parser(A)) -> parser(A).
 between(Left, Right, Item) ->
   then_right(Left, then_left(Item, Right)).
+
+one_of([]) ->
+  fun(Input) -> {error, Input} end;
+one_of([C | Rest]) ->
+  fun([First | RestInput] = Input) ->
+    case First of
+      C -> {ok, C, RestInput};
+      _ -> (one_of(Rest))(Input)
+    end
+  end.
