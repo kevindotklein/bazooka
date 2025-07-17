@@ -1,9 +1,18 @@
 bazooka
 =====
 
-An OTP library
+a parser combinator library
 
-Build
+use as dependency (rebar3)
 -----
+1. rebar.config:
 
-    $ rebar3 compile
+```
+{deps, [
+  {bazooka, {git, "https://github.com/kevindotklein/bazooka.git", {branch, "main"}}}
+]}.
+```
+
+2. shell:
+
+    $ rebar3 get-deps
