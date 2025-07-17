@@ -15,4 +15,6 @@ use as dependency (rebar3)
 
 2. shell:
 
-    $ rebar3 get-deps
+```
+$ rebar3 get-deps
+```
