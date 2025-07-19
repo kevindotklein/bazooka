@@ -18,3 +18,18 @@ use as dependency (rebar3)
 ```
 $ rebar3 get-deps
 ```
+
+compile and run tests
+-----
+1. compile:
+
+```
+$ rebar3 compile
+```
+
+
+2. run tests:
+
+```
+$ rebar3 eunit
+```
