@@ -1,5 +1,5 @@
 {application, bazooka,
- [{description, "A lean parser combinator lib"},
+ [{description, "a lean parser combinator lib"},
   {vsn, "1.0.0"},
   {registered, []},
   {applications,
