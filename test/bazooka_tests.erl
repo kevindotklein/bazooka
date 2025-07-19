@@ -36,3 +36,7 @@ choice_test() ->
   Choice = bazooka:choice([MatchA, MatchB]),
   ?assertEqual({ok, $a, "c"}, Choice("ac")),
   ?assertEqual({ok, $b, "c"}, Choice("bc")).
+
+pure_test() ->
+  Pure = bazooka:pure("zzz"),
+  ?assertEqual({ok, "zzz", "aaa"}, Pure("aaa")).
