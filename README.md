@@ -7,7 +7,7 @@ use as dependency (rebar3)
 -----
 1. rebar.config:
 
-```
+```erlang
 {deps, [
   {bazooka, {git, "https://github.com/kevindotklein/bazooka.git", {branch, "main"}}}
 ]}.
