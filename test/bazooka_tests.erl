@@ -40,3 +40,10 @@ choice_test() ->
 pure_test() ->
   Pure = bazooka:pure("zzz"),
   ?assertEqual({ok, "zzz", "aaa"}, Pure("aaa")).
+
+applicative_test() ->
+  Match1 = bazooka:match_char($1),
+  Match2 = bazooka:match_char($2),
+  Fmap = bazooka:fmap(Match1, fun(N1) -> fun(N2) -> (N1 - $0) + (N2 - $0) end end),
+  Applicative = bazooka:applicative(Fmap, Match2),
+  ?assertEqual({ok, 3, ""}, Applicative("12")).
