@@ -47,3 +47,15 @@ applicative_test() ->
   Fmap = bazooka:fmap(Match1, fun(N1) -> fun(N2) -> (N1 - $0) + (N2 - $0) end end),
   Applicative = bazooka:applicative(Fmap, Match2),
   ?assertEqual({ok, 3, ""}, Applicative("12")).
+
+span_test() ->
+  Span = bazooka:span(fun bazooka:is_digit/1),
+  ?assertEqual({ok, "1234", ""}, Span("1234")).
+
+then_right_test() ->
+  ThenRight = bazooka:then_right(bazooka:match_char($a), bazooka:match_char($b)),
+  ?assertEqual({ok, $b, "c"}, ThenRight("abc")).
+
+then_left_test() ->
+  ThenLeft = bazooka:then_left(bazooka:match_char($a), bazooka:match_char($b)),
+  ?assertEqual({ok, $a, "c"}, ThenLeft("abc")).
