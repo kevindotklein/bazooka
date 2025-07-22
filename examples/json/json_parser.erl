@@ -50,9 +50,9 @@ p_json_number() ->
 
 -spec p_json_string() -> bazooka:parser(json_value()).
 p_json_string() ->
-  StrParser = bazooka:then_right(
-                bazooka:match_char($"),
-                bazooka:then_left(bazooka:string_literal(), bazooka:match_char($"))),
+  StrParser = bazooka:between(bazooka:match_char($"),
+                              bazooka:match_char($"),
+                              bazooka:string_literal()),
   bazooka:fmap(
     StrParser,
     fun(String) -> {json_string, String} end).

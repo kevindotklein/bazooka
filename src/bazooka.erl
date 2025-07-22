@@ -186,15 +186,23 @@ then_left(P1, P2) ->
     end
   end.
 
-%% TODO: escape chars
 -spec string_literal() -> parser(string()).
 string_literal() ->
-  span(fun(Char) ->
-           case Char of
-               $" -> false;
-               _  -> true
-           end
-       end).
+  fun(Input) -> string_literal_loop(Input, []) end.
+
+string_literal_loop([], Acc) ->
+  {ok, lists:reverse(Acc), ""};
+string_literal_loop([H|T], Acc) ->
+  case H of
+    92 -> case T of
+            [EscapedChar | Rest] ->
+              string_literal_loop(Rest, [EscapedChar, 92] ++ Acc);
+            [] ->
+              {error, ""}
+          end;
+      $" -> {ok, lists:reverse(Acc), [H|T]};
+    _  -> string_literal_loop(T, [H | Acc])
+  end.
 
 -spec spaces() -> parser(string()).
 spaces() ->
