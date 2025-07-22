@@ -69,3 +69,7 @@ sep_by_test() ->
   Sep = bazooka:between(bazooka:spaces(), bazooka:spaces(), bazooka:match_char($,)),
   SepBy = bazooka:sep_by(Sep, bazooka:match_char($a)),
   ?assertEqual({ok, [$a, $a, $a], ""}, SepBy("a, a, a")).
+
+one_of_test() ->
+  OneOf = bazooka:one_of("!@#$%¨&*"),
+  ?assertEqual({ok, $!, ""}, OneOf("!")).
