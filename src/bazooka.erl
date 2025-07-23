@@ -21,7 +21,8 @@
         lazy/1,
         between/3,
         one_of/1,
-        letter/0]).
+        letter/0,
+        digit/0]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -248,3 +249,8 @@ one_of([C | Rest]) ->
   Char :: char().
 letter() ->
   one_of("abcdefghijklmnopqrstuvwxyz").
+
+-spec digit() -> parser(Char) when
+  Char :: char().
+digit() ->
+  one_of("0123456789").
