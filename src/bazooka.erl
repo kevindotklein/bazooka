@@ -20,7 +20,8 @@
         sep_by/2,
         lazy/1,
         between/3,
-        one_of/1]).
+        one_of/1,
+        letter/0]).
 -export_type([parser/1]).
 
 -type parser(ValueType) ::
@@ -230,6 +231,9 @@ sep_by(P1, P2) ->
 between(Left, Right, Item) ->
   then_right(Left, then_left(Item, Right)).
 
+-spec one_of(Chars) -> parser(Char) when
+  Chars :: [char()],
+  Char :: char().
 one_of([]) ->
   fun(Input) -> {error, Input} end;
 one_of([C | Rest]) ->
@@ -239,3 +243,8 @@ one_of([C | Rest]) ->
       _ -> (one_of(Rest))(Input)
     end
   end.
+
+-spec letter() -> parser(Char) when
+  Char :: char().
+letter() ->
+  one_of("abcdefghijklmnopqrstuvwxyz").
