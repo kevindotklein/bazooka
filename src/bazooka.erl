@@ -238,19 +238,25 @@ between(Left, Right, Item) ->
 one_of([]) ->
   fun(Input) -> {error, Input} end;
 one_of([C | Rest]) ->
-  fun([First | RestInput] = Input) ->
-    case First of
-      C -> {ok, C, RestInput};
-      _ -> (one_of(Rest))(Input)
-    end
+  fun
+    ([] = Input) -> {error, Input};
+    ([First | RestInput] = Input) ->
+      case First of
+        C -> {ok, C, RestInput};
+        _ -> (one_of(Rest))(Input)
+      end
   end.
 
 -spec letter() -> parser(Char) when
   Char :: char().
 letter() ->
-  one_of("abcdefghijklmnopqrstuvwxyz").
+  fun(Input) ->
+    (one_of("abcdefghijklmnopqrstuvwxyz"))(Input)
+  end.
 
 -spec digit() -> parser(Char) when
   Char :: char().
 digit() ->
-  one_of("0123456789").
+  fun(Input) ->
+    (one_of("0123456789"))(Input)
+  end.
